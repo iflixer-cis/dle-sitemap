@@ -107,6 +107,7 @@ func (s *Service) loadData() (err error) {
 
 		smIndex.Add("sitemap_static.xml", "")
 		smIndex.Add("sitemap_pages.xml", "")
+		smIndex.Add("sitemap_persons.xml", "")
 
 		if d.PostID == 0 { // generate sitemap for all posts
 			smIndex.Add("sitemap_category.xml", "")
