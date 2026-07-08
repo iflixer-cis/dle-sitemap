@@ -43,6 +43,15 @@ func (s *Service) loadData() (err error) {
 		log.Println("loadData: loaded posts ", len(posts))
 	}
 
+	//load persons
+	persons := []*database.Person{}
+	if persons, err = s.dbService.PersonsAll(); err != nil {
+		log.Println("Cannot load persons", err)
+		return err
+	} else {
+		log.Println("loadData: loaded persons ", len(persons))
+	}
+
 	// load categories
 	cats := []*database.Category{}
 	if cats, err = s.dbService.CatsAll(); err != nil {
@@ -86,6 +95,9 @@ func (s *Service) loadData() (err error) {
 
 		smPages := &SmSitemap{}
 		smPages.Init(dom, tmpFolder, "sitemap_pages.xml")
+
+		smPersons := &SmSitemap{}
+		smPersons.Init(dom, tmpFolder, "sitemap_persons.xml")
 
 		smCollections := &SmSitemap{}
 		smCollections.Init(dom, tmpFolder, "sitemap_collections.xml")
@@ -170,6 +182,16 @@ func (s *Service) loadData() (err error) {
 			}
 			log.Println("Added posts:", addedPostsQty)
 
+			//persons
+			log.Println("Total persons:", len(persons))
+			for _, p := range persons {
+				smPersons.Add(SmSitemapRow{
+					Loc:        domainPrefix + "/" + p.URL,
+					ChangeFreq: "weekly",
+					Priority:   "0.1",
+				})
+			}
+
 		} else { // generate sitemap for specific post
 			log.Println("Generating sitemap for post ID:", d.PostID)
 			for _, p := range posts {
@@ -206,7 +228,7 @@ func (s *Service) loadData() (err error) {
 		smCollections.Close()
 		smNews.Close()
 		smPages.Close()
-
+		smPersons.Close()
 		targetFolder := os.Getenv("STORAGE_PATH") + "/" + dom
 
 		// cant use rename because of different file systems
