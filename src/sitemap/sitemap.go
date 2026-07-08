@@ -106,8 +106,6 @@ func (s *Service) loadData() (err error) {
 		smCats.Init(dom, tmpFolder, "sitemap_category.xml")
 
 		smIndex.Add("sitemap_static.xml", "")
-		smIndex.Add("sitemap_pages.xml", "")
-		smIndex.Add("sitemap_persons.xml", "")
 
 		if d.PostID == 0 { // generate sitemap for all posts
 			smIndex.Add("sitemap_category.xml", "")
@@ -161,6 +159,7 @@ func (s *Service) loadData() (err error) {
 
 			// posts
 			log.Println("Total posts:", len(posts))
+			smIndex.Add("sitemap_pages.xml", "")
 			addedPostsQty := 0
 			for _, p := range posts {
 				if d.CategoryRoot > 0 && p.CategoryRoot != d.CategoryRoot {
@@ -184,6 +183,7 @@ func (s *Service) loadData() (err error) {
 			log.Println("Added posts:", addedPostsQty)
 
 			//persons
+			smIndex.Add("sitemap_persons.xml", "")
 			log.Println("Total persons:", len(persons))
 			for _, p := range persons {
 				smPersons.Add(SmSitemapRow{
