@@ -95,6 +95,7 @@ func (s *Service) loadData() (err error) {
 
 		smPages := &SmSitemap{}
 		smPages.Init(dom, tmpFolder, "sitemap_pages.xml")
+		smIndex.Add("sitemap_pages.xml", "")
 
 		smPersons := &SmSitemap{}
 		smPersons.Init(dom, tmpFolder, "sitemap_persons.xml")
@@ -159,7 +160,6 @@ func (s *Service) loadData() (err error) {
 
 			// posts
 			log.Println("Total posts:", len(posts))
-			smIndex.Add("sitemap_pages.xml", "")
 			addedPostsQty := 0
 			for _, p := range posts {
 				if d.CategoryRoot > 0 && p.CategoryRoot != d.CategoryRoot {
@@ -210,6 +210,7 @@ func (s *Service) loadData() (err error) {
 								Priority:   "0.9",
 							})
 							for _, episode := range season.Episodes {
+								log.Println("Adding episode to sitemap:", season.SeasonNumber, episode.EpisodeNumber)
 								smPages.Add(SmSitemapRow{
 									Loc:        domainPrefix + "/season" + helper.IntToString(season.SeasonNumber) + "/episode" + helper.IntToString(episode.EpisodeNumber),
 									ChangeFreq: "weekly",
