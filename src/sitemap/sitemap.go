@@ -95,7 +95,6 @@ func (s *Service) loadData() (err error) {
 
 		smPages := &SmSitemap{}
 		smPages.Init(dom, tmpFolder, "sitemap_pages.xml")
-		smIndex.Add("sitemap_pages.xml", "")
 
 		smPersons := &SmSitemap{}
 		smPersons.Init(dom, tmpFolder, "sitemap_persons.xml")
@@ -106,11 +105,13 @@ func (s *Service) loadData() (err error) {
 		smCats := &SmSitemap{}
 		smCats.Init(dom, tmpFolder, "sitemap_category.xml")
 
-		smIndex.Add("sitemap_static.xml", "")
+		addCatsToIndex := false
+		addCollectionsToIndex := false
+		addPersonsToIndex := false
 
 		if d.PostID == 0 { // generate sitemap for all posts
-			smIndex.Add("sitemap_category.xml", "")
-			smIndex.Add("sitemap_collections.xml", "")
+			addCatsToIndex = true
+			addCollectionsToIndex = true
 			if rootCats, err := s.dbService.Cats(0); err != nil {
 				log.Println("Cannot load root categories", err)
 				return err
@@ -183,7 +184,7 @@ func (s *Service) loadData() (err error) {
 			log.Println("Added posts:", addedPostsQty)
 
 			//persons
-			smIndex.Add("sitemap_persons.xml", "")
+			addPersonsToIndex = true
 			log.Println("Total persons:", len(persons))
 			for _, p := range persons {
 				smPersons.Add(SmSitemapRow{
@@ -225,12 +226,35 @@ func (s *Service) loadData() (err error) {
 		}
 
 		smStatic.Close()
-		smIndex.Close()
 		smCats.Close()
 		smCollections.Close()
 		smNews.Close()
 		smPages.Close()
 		smPersons.Close()
+
+		for _, name := range smStatic.FileNames() {
+			smIndex.Add(name, "")
+		}
+		for _, name := range smPages.FileNames() {
+			smIndex.Add(name, "")
+		}
+		if addCatsToIndex {
+			for _, name := range smCats.FileNames() {
+				smIndex.Add(name, "")
+			}
+		}
+		if addCollectionsToIndex {
+			for _, name := range smCollections.FileNames() {
+				smIndex.Add(name, "")
+			}
+		}
+		if addPersonsToIndex {
+			for _, name := range smPersons.FileNames() {
+				smIndex.Add(name, "")
+			}
+		}
+
+		smIndex.Close()
 		targetFolder := os.Getenv("STORAGE_PATH") + "/" + dom
 
 		// cant use rename because of different file systems
