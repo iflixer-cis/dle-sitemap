@@ -96,22 +96,18 @@ func (s *Service) loadData() (err error) {
 		smPages := &SmSitemap{}
 		smPages.Init(dom, tmpFolder, "sitemap_pages.xml")
 
-		smPersons := &SmSitemap{}
-		smPersons.Init(dom, tmpFolder, "sitemap_persons.xml")
-
-		smCollections := &SmSitemap{}
-		smCollections.Init(dom, tmpFolder, "sitemap_collections.xml")
-
-		smCats := &SmSitemap{}
-		smCats.Init(dom, tmpFolder, "sitemap_category.xml")
-
-		addCatsToIndex := false
-		addCollectionsToIndex := false
-		addPersonsToIndex := false
+		var smPersons, smCollections, smCats *SmSitemap
 
 		if d.PostID == 0 { // generate sitemap for all posts
-			addCatsToIndex = true
-			addCollectionsToIndex = true
+			smPersons = &SmSitemap{}
+			smPersons.Init(dom, tmpFolder, "sitemap_persons.xml")
+
+			smCollections = &SmSitemap{}
+			smCollections.Init(dom, tmpFolder, "sitemap_collections.xml")
+
+			smCats = &SmSitemap{}
+			smCats.Init(dom, tmpFolder, "sitemap_category.xml")
+
 			if rootCats, err := s.dbService.Cats(0); err != nil {
 				log.Println("Cannot load root categories", err)
 				return err
@@ -184,7 +180,6 @@ func (s *Service) loadData() (err error) {
 			log.Println("Added posts:", addedPostsQty)
 
 			//persons
-			addPersonsToIndex = true
 			log.Println("Total persons:", len(persons))
 			for _, p := range persons {
 				smPersons.Add(SmSitemapRow{
@@ -226,11 +221,13 @@ func (s *Service) loadData() (err error) {
 		}
 
 		smStatic.Close()
-		smCats.Close()
-		smCollections.Close()
 		smNews.Close()
 		smPages.Close()
-		smPersons.Close()
+		if d.PostID == 0 {
+			smCats.Close()
+			smCollections.Close()
+			smPersons.Close()
+		}
 
 		for _, name := range smStatic.FileNames() {
 			smIndex.Add(name, "")
@@ -238,17 +235,13 @@ func (s *Service) loadData() (err error) {
 		for _, name := range smPages.FileNames() {
 			smIndex.Add(name, "")
 		}
-		if addCatsToIndex {
+		if d.PostID == 0 {
 			for _, name := range smCats.FileNames() {
 				smIndex.Add(name, "")
 			}
-		}
-		if addCollectionsToIndex {
 			for _, name := range smCollections.FileNames() {
 				smIndex.Add(name, "")
 			}
-		}
-		if addPersonsToIndex {
 			for _, name := range smPersons.FileNames() {
 				smIndex.Add(name, "")
 			}
