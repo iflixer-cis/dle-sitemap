@@ -69,6 +69,10 @@ func (sf *SmSitemap) Add(row SmSitemapRow) error {
 }
 
 func (sf *SmSitemap) FileNames() []string {
+	if sf.rowsCount == 0 {
+		return nil
+	}
+
 	out := make([]string, len(sf.fileNames))
 	copy(out, sf.fileNames)
 	return out
