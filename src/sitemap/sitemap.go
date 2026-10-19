@@ -19,7 +19,8 @@ func NewService(dbService *database.Service, updatePeriod int) (s *Service, err 
 		dbService:    dbService,
 		updatePeriod: time.Duration(updatePeriod),
 	}
-	err = s.loadData()
+	// initial load of data is commented out to avoid blocking
+	// err = s.loadData()
 	go s.loadWorker()
 	return
 }
