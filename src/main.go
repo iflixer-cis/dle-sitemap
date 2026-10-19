@@ -51,7 +51,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	serverService, err := server.NewService(port, sitemapService)
+	serverService, err := server.NewService(port, sitemapService, dbService)
 	if err != nil {
 		log.Fatal(err)
 	}

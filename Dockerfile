@@ -22,5 +22,8 @@ COPY --from=build-env /server/build/httpserver /app/dle-sitemap
 
 #EXPOSE 28091/tcp
 
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+    CMD wget -q -O /dev/null "http://127.0.0.1:${HTTP_PORT}/health" || exit 1
+
 ENTRYPOINT [ "/app/dle-sitemap" ]
 #ENTRYPOINT [ "ls", "-la", "/app/httpserver" ]

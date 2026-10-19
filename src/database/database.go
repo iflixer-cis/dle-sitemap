@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"os"
 	"strconv"
 
@@ -31,4 +32,12 @@ func NewService(mysqlURL string) (s *Service, err error) {
 	}
 
 	return
+}
+
+func (s *Service) Ping(ctx context.Context) error {
+	sqlDB, err := s.DB.DB()
+	if err != nil {
+		return err
+	}
+	return sqlDB.PingContext(ctx)
 }
